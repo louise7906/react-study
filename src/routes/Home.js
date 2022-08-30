@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import { dbService } from "fbase";
+import { dbService, storageService } from "fbase";
 import Tweet from "components/Tweet";
+//import { v4 as uuidv4 } from 'uuid';
+import TweetFactory from "components/TweetFactory";
 
 const Home=({userObj})=>{
     //console.log(userObj);
-    const [tweet, setTweet]=useState("");
+
     const [tweets, setTweets]=useState([]);
+
 
 //get()함수를 쓰면 처음 화면을 렌더링할때만 실행됨.실시간이 안됨
     // const getTweets=async()=>{
@@ -23,7 +26,7 @@ const Home=({userObj})=>{
     useEffect(()=>{
        // getTweets();
 
-        dbService.collection("tweets").onSnapshot((snapshot)=>{
+        dbService.collection("tweets").orderBy("createdAt","desc").onSnapshot((snapshot)=>{
             const newArray=snapshot.docs.map((document)=>({
                 id: document.id,
                 ...document.data(),
@@ -34,31 +37,12 @@ const Home=({userObj})=>{
 
    // console.log(tweets)
 
-    const onSubmit=async (event)=>{
-        event.preventDefault();
-        await dbService.collection("tweets").add({
-            text:tweet,
-            createdAt:Date.now(),
-            creatorId:userObj.uid,
-        });
-        setTweet("");
-    };
 
-    const onChange=(event)=>{
-        event.preventDefault();
-        const {
-            target:{value},
-        }=event;
-        setTweet(value)
-    }
    
     return (
-        <>
-        <form onSubmit={onSubmit}>
-            <input value={tweet} onChange={onChange} type="text" placeholder="What's on your mind" maxLength={120}/>
-            <input type="submit" value="Tweet" />
-        </form>
-        <div>
+       <div className="container">
+       <TweetFactory userObj={userObj}/>
+        <div style={{marginTop:30}}>
             {tweets.map((tweet)=>(
                 // <div key={tweet.id}>
                 //     <h4>{tweet.text}</h4>
@@ -71,7 +55,7 @@ const Home=({userObj})=>{
                
             ))}
         </div>
-        </>
+       </div>
     );
 
 };

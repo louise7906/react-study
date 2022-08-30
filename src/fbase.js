@@ -3,6 +3,7 @@
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
+import "firebase/compat/storage";
 
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_API_KEY,
@@ -21,3 +22,4 @@ const firebaseConfig = {
   export const firebaseInstance=firebase;
   export const authService=firebase.auth();  //다른 파일에서 참조하도록 내보냄
   export const dbService=firebase.firestore();
+  export const storageService=firebase.storage(); // 사진 동영상 저장

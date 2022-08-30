@@ -8,7 +8,8 @@ import {authService} from "fbase";  // 모듈 단위로 import 패키지 전체�
 function App() {
   const [init, setInit]=useState(false);
  
-  const [isLoggedIn, SetIsLoggedIn]=useState(false);
+ // const [isLoggedIn, SetIsLoggedIn]=useState(false);
+
  //console.log(authService.currentUser)
   //setInterval(() => console.log(authService.currentUser), 2000);
   //로그인 마치고 2초마다 실행해서 currentuser값을 출력
@@ -19,21 +20,38 @@ function App() {
   useEffect(()=>{
     authService.onAuthStateChanged((user)=>{
       if(user){
-        SetIsLoggedIn(user);
-        setUserObj(user); 
+       // SetIsLoggedIn(user);
+        setUserObj({
+          uid:user.uid,
+          displayName:user.displayName,
+          updateProfile: (args)=>user.updateProfile(args),
+        }); 
       }else{
-        SetIsLoggedIn(false);
+        //SetIsLoggedIn(false);
+        setUserObj(false)
       }
       setInit(true);
     });
   },[]  );
 
+  const refreshUser=()=>{
+    const user = authService.currentUser;
+    setUserObj({
+      uid: user.uid,
+      displayName: user.displayName,
+      updateProfile: (args) => user.updateProfile(args),
+    });
+  }
 
   return (
   <>
-  {init ? (<AppRouter isLoggedIn={isLoggedIn} userObj={userObj} />) : ("initiallizing..")}
+  {init ? (<AppRouter 
+  isLoggedIn={Boolean(userObj)} 
+  userObj={userObj}
+  refreshUser={refreshUser} 
+  />) : ("initiallizing..")}
 
-  <footer>&copy; {new Date().getFullYear()} SYtwitter </footer>
+
   </>
   );
 }
